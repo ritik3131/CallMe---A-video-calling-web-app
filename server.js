@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", (msg) => {
-      socket.to(roomId).emit("leave", users[socket.id]);
+      socket.to(roomId).emit("leave", users[socket.id],userId);
     });
   });
 });

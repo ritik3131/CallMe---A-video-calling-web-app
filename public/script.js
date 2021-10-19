@@ -5,12 +5,14 @@ var peer = new Peer(undefined, {
   host: "/",
   port: "3030",
 });
-
+const peers = {};
 //To paly the video---------------------------
 const myvideo = document.createElement("video");
 myvideo.classList.add("livevideo");
 const videoGrid = document.getElementById("video-grid");
 //myvideo.muted = true;
+
+
 const connectToNewuser = (userId, stream) => {
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
@@ -19,10 +21,12 @@ const connectToNewuser = (userId, stream) => {
     addVideoStream(video, userVideoStream);
   });
 
-  call.on('close', () => {
-    video.remove()
-  })
+  call.on("close", () => {
+    video.remove();
+  });
+  peers[userId] = call;
 };
+
 
 let myVideoStream;
 navigator.mediaDevices
@@ -33,7 +37,7 @@ navigator.mediaDevices
     //To answer
     socket.on("user-connected", (userId, name) => {
       //connectToNewuser(userId, localMediaStream);
-      setTimeout(connectToNewuser,3000,userId,localMediaStream);
+      setTimeout(connectToNewuser, 3000, userId, localMediaStream);
       if (name) append(`${name} joined the meet`, "center");
     });
   });
@@ -63,7 +67,6 @@ peer.on("open", (id) => {
   socket.emit("user-joined", ROOM_ID, id, name);
 });
 
-
 /*------------------------Adding chatting features-----------------------------------*/
 
 function append(msg, position) {
@@ -90,7 +93,8 @@ socket.on("receive", (data) => {
   append(`${data.name}: ${data.message}`, "left");
 });
 
-socket.on("leave", (data) => {
+socket.on("leave", (data,userId) => {
+  if (peers[userId]) peers[userId].close()
   if (data) append(`${data} leave the chat`, "center");
 });
 
