@@ -1,4 +1,4 @@
-Nodejs-Zoom-Clone
+CallMe - A video calling web app
 =========================
 
 This is Nodejs video calling app.In this app we can chat will the other user in real time and for this purpose socket.io is used.
