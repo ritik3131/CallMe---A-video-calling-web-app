@@ -3,15 +3,15 @@ const socket = io("/");
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "3030",
+  port: "443",
 });
 const peers = {};
-//To paly the video---------------------------
+
+/*----------------------To paly the video---------------------------*/
 const myvideo = document.createElement("video");
 myvideo.classList.add("livevideo");
 const videoGrid = document.getElementById("video-grid");
 //myvideo.muted = true;
-
 
 const connectToNewuser = (userId, stream) => {
   const call = peer.call(userId, stream);
@@ -27,20 +27,19 @@ const connectToNewuser = (userId, stream) => {
   peers[userId] = call;
 };
 
-
 let myVideoStream;
 navigator.mediaDevices
   .getUserMedia({ video: true, audio: true }) //It will return a promise
   .then((localMediaStream) => {
     addVideoStream(myvideo, localMediaStream);
     myVideoStream = localMediaStream;
-    //To answer
     socket.on("user-connected", (userId, name) => {
       //connectToNewuser(userId, localMediaStream);
       setTimeout(connectToNewuser, 3000, userId, localMediaStream);
       if (name) append(`${name} joined the meet`, "center");
     });
   });
+//To answer
 peer.on("call", (call) => {
   call.answer(myVideoStream);
   console.log("hello");
@@ -61,7 +60,6 @@ function addVideoStream(myvideo, localMediaStream) {
   videoGrid.append(myvideo);
 }
 /*------------------------------------------------------------ */
-
 name = prompt("Enter your name to join->");
 peer.on("open", (id) => {
   socket.emit("user-joined", ROOM_ID, id, name);
@@ -93,8 +91,8 @@ socket.on("receive", (data) => {
   append(`${data.name}: ${data.message}`, "left");
 });
 
-socket.on("leave", (data,userId) => {
-  if (peers[userId]) peers[userId].close()
+socket.on("leave", (data, userId) => {
+  if (peers[userId]) peers[userId].close();
   if (data) append(`${data} leave the chat`, "center");
 });
 
@@ -119,7 +117,7 @@ function setunmutebutton() {
 function setmutebutton() {
   let html = `<i class="fas fa-microphone-alt"></i>
   <span>Mute</span>`;
-
+  
   document.querySelector(".main__mute_button").innerHTML = html;
 }
 
@@ -144,6 +142,53 @@ function stopvideo() {
 function playvideo() {
   let html = `<i class="fas fa-video"></i>
   <span>Stop Video</span>`;
-
+  
   document.querySelector(".main__video_button").innerHTML = html;
 }
+/* ------------------------------------------------------------ */
+
+
+/*--------------------------Chat scroll------------------------*/
+const chatbtn = document.querySelector(".chat__button");
+let i = 0;
+chatbtn.addEventListener("click", () => {
+  if (i % 2 == 0) {
+    document.querySelector(".main__right").style.display = "none";
+    document.querySelector(".main__left").style.flex = 1;
+  } else {
+    document.querySelector(".main__right").style.display = "flex";
+    document.querySelector(".main__left").style.flex = 0.8;
+  }
+  i++;
+});
+/* ------------------------------------------------------------- */
+
+/* ------------------------Participants list----------------------- */
+// let j = 0;
+// const participantbtn = document.querySelector(".participant__button");
+// participantbtn.addEventListener("click", () => {
+//   console.log(alltimeusername);
+//   alltimeusername.forEach((name) => {});
+//   if (document.querySelector(".participants__list")) {
+//     document.querySelector(
+//       ".participants__list"
+//     ).innerHTML = `<h1 class="message center">Participants</h1>
+//     <h4  class="message center">Total Participants: ${alltimeusername.length}</h4>
+//     <ol class="message">
+       
+//     </ol>`;
+//   } else {
+//     const participantdiv = document.createElement("div");
+//     participantdiv.classList.add("participants__list");
+//     document.querySelector(".main").append(participantdiv);
+//   }
+//   if (j % 2 == 0) {
+//     document.querySelector(".main__right").style.display = "none";
+//     document.querySelector(".participants__list").style.display = "flex";
+//   } else {
+//     document.querySelector(".main__right").style.display = "flex";
+//     document.querySelector(".participants__list").style.display = "none";
+//   }
+//   j++;
+// });
+/*-------------------------------------------------------------------- */

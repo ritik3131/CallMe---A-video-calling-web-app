@@ -4,7 +4,7 @@ const app = express();
 
 const { v4: uuidv4 } = require("uuid");
 
-server = app.listen(3030);
+server = app.listen(process.env.PORT||3030);
 
 const { ExpressPeerServer } = require("peer");
 const peerServer = ExpressPeerServer(server, {
